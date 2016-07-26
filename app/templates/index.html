@@ -16,12 +16,12 @@
                 <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_followed') }}">最新文章</a></li>
             </ul>
             {% include '_posts.html' %}
+             {% if pagination %}
+            <div class="pagination">
+                {{ macros.pagination_widget(pagination, '.index') }}
+            </div>
+            {% endif %}
         </div>
-        {% if pagination %}
-        <div class="pagination">
-            {{ macros.pagination_widget(pagination, '.index') }}
-        </div>
-        {% endif %}
     </div>
     <div class="col-md-4">
         <div class="panel panel-default">
