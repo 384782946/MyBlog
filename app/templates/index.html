@@ -5,10 +5,10 @@
 {% block title %}MyBlog - Home{% endblock %}
 
 {% block page_content %}
+<div class="page-header">
+    <h1>Stay hungry,Stay foolish.</h1>
+</div>
 <div class="row">
-    <div class="page-header">
-        <h1>Stay hungry,Stay foolish.</h1>
-    </div>
     <div class="col-md-8">
         <div class="post-tabs">
             <ul class="nav nav-tabs">
@@ -24,11 +24,12 @@
         {% endif %}
     </div>
     <div class="col-md-4">
-        <div class="panel panel-default">
+        <div class="panel panel-primary">
           <div class="panel-heading">网站信息</div>
           <div class="panel-body">
             <p>站长:<a href="{{ url_for('main.user',username='xiaojian')}}">张潇健</a></p>
-              <p>Github:</p><a href="https://www.github.com/384782946">xxx</a>
+            <p>邮箱:<a href="mailto:384782946@qq.com">384782946@qq.com</a></p>
+            <p>Github:<a href="https://www.github.com/384782946">https://www.github.com/384782946</a></p>
           </div>
         </div>
     </div>
