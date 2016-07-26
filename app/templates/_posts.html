@@ -7,7 +7,7 @@
             <a href="{{ url_for('.user', username=post.author.username) }}">
                 <img class="media-object" src="{{ post.author.gravatar(size=40) }}">
             </a>
-            <!--<div><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>-->
+            <div><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
           </div>
           <div class="media-body">
             <h4 class="media-heading">
