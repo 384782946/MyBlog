@@ -14,17 +14,10 @@
                 <a href="{{ url_for('.post',id=post.id)  }}">{{ post.title }}</a>
                 <p class="small pull-right">{{ moment(post.timestamp).fromNow() }}</p>
             </h4>
-              {% if editable %}
                 {% if post.body_html %}
                    {{ post.body_html | safe }}
                 {% else %}
                    {{ post.body }}
-                {% endif %}
-              {% else %}
-                {% if post.body_html %}
-                   {{ post.body_html | truncate(400) | safe }}
-                {% else %}
-                   {{ post.body | truncate(400) }}
                 {% endif %}
               {% endif %}
             <div>
