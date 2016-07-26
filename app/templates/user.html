@@ -21,7 +21,10 @@
         {% endif %}
         {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
         <p>Member since {{ moment(user.member_since).format('L') }}. Last seen {{ moment(user.last_seen).fromNow() }}.</p>
-        <p>{{ user.posts.count() }} blog posts. {{ user.comments.count() }} comments.</p>
+        <p> 
+            <a href="{{ url_for('.myposts', username=user.username) }}">Posts: <span class="badge">{{ user.posts.count()  }}</span></a>
+            <a href="#">Comments: <span class="badge">{{ user.comments.count()  }}</span></a>
+        </p>
         <p>
             {% if current_user.can(Permission.FOLLOW) and user != current_user %}
                 {% if not current_user.is_following(user) %}
@@ -46,11 +49,4 @@
         </p>
     </div>
 </div>
-<h3>Posts by {{ user.username }}</h3>
-{% include '_posts.html' %}
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, '.user', username=user.username) }}
-</div>
-{% endif %}
 {% endblock %}

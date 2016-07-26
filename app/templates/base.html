@@ -24,13 +24,13 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="{{ url_for('main.index') }}">主页</a></li>
-                {% if current_user.is_authenticated %}
-                <!--<li><a href="{{ url_for('main.user', username=current_user.username) }}">用户中心</a></li>-->
-                {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.can(Permission.MODERATE_COMMENTS) %}
                 <li><a href="{{ url_for('main.moderate') }}">评论审查</a></li>
+                {% endif %}
+                {% if current_user.can(Permission.WRITE_ARTICLES) %}
+                <li><a href="{{ url_for('main.newpost') }}">写博客</a></li>
                 {% endif %}
                 {% if current_user.is_authenticated %}
                 <li class="dropdown">
@@ -39,7 +39,6 @@
                         {{ current_user.username }} <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url_for('main.newpost') }}">写博客</a></li>
 			<li><a href="{{ url_for('main.user', username=current_user.username) }}">个人信息</a></li>
                         <li><a href="{{ url_for('auth.change_password') }}">修改密码</a></li>
                         <li><a href="{{ url_for('auth.change_email_request') }}">更改邮箱</a></li>

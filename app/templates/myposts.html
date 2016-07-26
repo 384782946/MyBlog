@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}MyBlog - 我的文章 {{ user.username }}{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1> 我的文章 | {{ user.username }}</h1>
+</div>
+{% include '_posts.html' %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.myposts', username = user.username) }}
+</div>
+{% endblock %}
