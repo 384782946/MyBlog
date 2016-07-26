@@ -152,8 +152,8 @@ def search():
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     posts = pagination.items
-    return render_template('index.html',  posts=posts,
-                           show_followed=False, pagination=pagination)
+    return render_template('search.html', user= current_user,
+                           posts=posts, key = key, pagination=pagination)
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
