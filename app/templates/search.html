@@ -9,6 +9,6 @@
 </div>
 {% include '_posts.html' %}
 <div class="pagination">
-    {{ macros.pagination_widget(pagination, '.search') }}
+    {{ macros.pagination_widget(pagination, '.search',search=key) }}
 </div>
 {% endblock %}
