@@ -181,7 +181,7 @@ def postdel(id):
         abort(403)
     db.session.delete(post)
     db.session.commit()
-    flash('The post has been delete.')
+    flash('The post has been deleted.')
     return redirect( url_for('.index') ) 
 
 @main.route('/new-post', methods=['GET','POST'])
