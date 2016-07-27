@@ -207,26 +207,26 @@ class User(UserMixin, db.Model):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
 
-    def _gravatar(self, size=100, default='identicon', rating='g'):
+    def _gravatar(self,hash,size=100, default='identicon', rating='g'):
         if request.is_secure:
             url = 'https://secure.gravatar.com/avatar'
         else:
             url = 'http://www.gravatar.com/avatar'
-        hash = self.avatar_hash or hashlib.md5(
-            self.email.encode('utf-8')).hexdigest()
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating)
     
     def gravatar(self,size=100,default='identicon',rating='g'):
-        #gravatar_url = self._gravatar(size,default,rating)
-        url = '/static/user_{x}x{y}.png'.format(x=size,y=size)
-        #path = current_app.config['FLASKY_ROOT'] + 'app'  + url
-        #if not os.path.exists(path):
-        #    self._download(gravatar_url,path)
+        hash = self.avatar_hash or hashlib.md5(
+            self.email.encode('utf-8')).hexdigest()
+        gravatar_url = self._gravatar(hash,size,default,rating)
+        url = '/static/img/{hash}_{size}.png'.format(hash=hash,size=size)
+        path = current_app.config['FLASKY_ROOT'] + 'app'  + url
+        if not os.path.exists(path):
+            self._download(gravatar_url,path)
         return url
     
-    #def _download(self,url,filepath):
-    #	urllib.urlretrieve(url, filepath)
+    def _download(self,url,filepath):
+    	urllib.urlretrieve(url, filepath)
 
     def follow(self, user):
         if not self.is_following(user) and self != user:

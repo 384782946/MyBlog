@@ -137,7 +137,7 @@ def post(id):
         page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
         error_out=False)
     comments = pagination.items
-    return render_template('post.html', posts=[post], form=form,editable=True,
+    return render_template('post.html', posts=[post], form=form,
                            comments=comments, pagination=pagination)
 
 @main.route('/search',methods=['GET','POST'])
