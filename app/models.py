@@ -222,11 +222,12 @@ class User(UserMixin, db.Model):
         url = '/static/img/{hash}_{size}.png'.format(hash=hash,size=size)
         path = current_app.config['FLASKY_ROOT'] + 'app'  + url
         if not os.path.exists(path):
-            self._download(gravatar_url,path)
+            if not self._download(gravatar_url,path):
+               url = '/static/img/user_{size}.png'.format(size=size)
         return url
     
     def _download(self,url,filepath):
-    	urllib.urlretrieve(url, filepath)
+    	return False#urllib.urlretrieve(url, filepath)
 
     def follow(self, user):
         if not self.is_following(user) and self != user:
