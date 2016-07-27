@@ -219,15 +219,24 @@ class User(UserMixin, db.Model):
         hash = self.avatar_hash or hashlib.md5(
             self.email.encode('utf-8')).hexdigest()
         gravatar_url = self._gravatar(hash,size,default,rating)
-        url = '/static/img/{hash}_{size}.png'.format(hash=hash,size=size)
+        url = '/static/{hash}_{size}.png'.format(hash=hash,size=size)
         path = current_app.config['FLASKY_ROOT'] + 'app'  + url
         if not os.path.exists(path):
             if not self._download(gravatar_url,path):
-               url = '/static/img/user_{size}.png'.format(size=size)
+               url = '/static/user_{size}.png'.format(size=size)
         return url
     
     def _download(self,url,filepath):
-    	return False#urllib.urlretrieve(url, filepath)
+    	urllib.urlretrieve(url, filepath)
+
+    @staticmethod
+    def download_all_img():
+        users = User.query.all()
+        for user in users:
+            hash = user.avatar_hash or hashlib.md5(user.email.encode('utf-8')).hexdigest()
+            for i in [18,40,256]:
+                gravatar_url = user._gravatar(hash,i)
+                user._download(gravatar_url,'{hash}_{size}.png'.format(hash=hash,size=i))
 
     def follow(self, user):
         if not self.is_following(user) and self != user:
