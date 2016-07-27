@@ -9,7 +9,7 @@ from flask import current_app, request, url_for
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from app.exceptions import ValidationError
 from . import db, login_manager
-
+import urllib,os
 
 class Permission:
     FOLLOW = 0x01
@@ -207,7 +207,7 @@ class User(UserMixin, db.Model):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
 
-    def gravatar(self, size=100, default='identicon', rating='g'):
+    def _gravatar(self, size=100, default='identicon', rating='g'):
         if request.is_secure:
             url = 'https://secure.gravatar.com/avatar'
         else:
@@ -216,6 +216,17 @@ class User(UserMixin, db.Model):
             self.email.encode('utf-8')).hexdigest()
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating)
+    
+    def gravatar(self,size=100,default='identicon',rating='g'):
+        #gravatar_url = self._gravatar(size,default,rating)
+        url = '/static/user_{x}x{y}.png'.format(x=size,y=size)
+        #path = current_app.config['FLASKY_ROOT'] + 'app'  + url
+        #if not os.path.exists(path):
+        #    self._download(gravatar_url,path)
+        return url
+    
+    #def _download(self,url,filepath):
+    #	urllib.urlretrieve(url, filepath)
 
     def follow(self, user):
         if not self.is_following(user) and self != user:
