@@ -52,11 +52,11 @@ class EditProfileAdminForm(Form):
 
 
 class PostForm(Form):
-    title = StringField(u'标题',validators=[Required()])
+    title = StringField(u'标题',validators=[Length(1,100)])
     body = PageDownField(u'内容', validators=[Required()])
     submit = SubmitField(u'提交')
 
 
 class CommentForm(Form):
-    body = StringField(u'输入评论', validators=[Required()])
+    body = StringField(u'输入评论', validators=[Length(1,100)])
     submit = SubmitField(u'提交')
