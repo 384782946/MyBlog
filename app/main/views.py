@@ -47,14 +47,14 @@ def index():
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     posts = pagination.items
-    return render_template('index.html',  posts=posts,
+    popular = User.query.outerjoin(Post).group_by(User.id).order_by(db.func.count(Post.id).desc()).limit(10).all()
+    return render_template('index.html',  posts=posts, popular=popular,
                            show_followed=show_followed, pagination=pagination)
 
 
 @main.route('/user/<username>')
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    #return render_template('user.html',user=user)
     page = request.args.get('page', 1, type=int)
     pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
         page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
