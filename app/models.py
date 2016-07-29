@@ -219,11 +219,11 @@ class User(UserMixin, db.Model):
         hash = self.avatar_hash or hashlib.md5(
             self.email.encode('utf-8')).hexdigest()
         gravatar_url = self._gravatar(hash,size,default,rating)
-        url = '/static/{hash}_{size}.png'.format(hash=hash,size=size)
+        url = '/static/img/{hash}_{size}.png'.format(hash=hash,size=size)
         path = current_app.config['FLASKY_ROOT'] + 'app'  + url
         if not os.path.exists(path):
             if not self._download(gravatar_url,path):
-               url = '/static/user_{size}.png'.format(size=size)
+               url = '/static/img/user_{size}.png'.format(size=size)
         return url
     
     def _download(self,url,filepath):
