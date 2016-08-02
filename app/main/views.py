@@ -63,6 +63,19 @@ def user(username):
     return render_template('user.html', user=user, posts=posts,
                            pagination=pagination)
 
+@main.route('/alluser')
+@login_required
+def allusers():
+    page = request.args.get('page', 1, type=int)
+    pagination = User.query.order_by(User.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+        error_out=False)
+    users = pagination.items
+    return render_template('alluser.html',
+                           pagination=pagination,
+                           users=users)
+    
+
 @main.route('/myposts/<username>')
 @login_required
 def myposts(username):
