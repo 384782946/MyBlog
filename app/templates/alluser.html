@@ -17,11 +17,11 @@
                 {{ user.username }}
             </a>
         </td>
-        <td>{{ moment(user.timestamp).format('L') }}</td>
+        <td>{{ moment(user.member_since).format('L') }}</td>
     </tr>
     {% endfor %}
 </table>
 <div class="pagination">
-    {{ macros.pagination_widget(pagination) }}
+    {{ macros.pagination_widget(pagination,endpoint = endpoint) }}
 </div>
 {% endblock %}

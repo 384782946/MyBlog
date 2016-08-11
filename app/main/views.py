@@ -55,26 +55,23 @@ def index():
 @main.route('/user/<username>')
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    page = request.args.get('page', 1, type=int)
-    pagination = user.posts.order_by(Post.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-        error_out=False)
-    posts = pagination.items
-    return render_template('user.html', user=user, posts=posts,
-                           pagination=pagination)
+    #page = request.args.get('page', 1, type=int)
+    #pagination = user.posts.order_by(Post.timestamp.desc()).paginate(    
+    #    page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+    #    error_out=False)
+    #posts = pagination.items
+    return render_template('user.html', user=user)#, posts=posts,pagination=pagination)
 
 @main.route('/alluser')
 @login_required
-def allusers():
+def alluser():
     page = request.args.get('page', 1, type=int)
-    pagination = User.query.order_by(User.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+    pagination = User.query.outerjoin(Post).group_by(User.id).order_by(db.func.count(Post.id).desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
         error_out=False)
     users = pagination.items
-    return render_template('alluser.html',
-                           pagination=pagination,
-                           users=users)
-    
+    return render_template('alluser.html',endpoint='.alluser',
+            pagination=pagination, users=users)
 
 @main.route('/myposts/<username>')
 @login_required
