@@ -3,12 +3,33 @@
 import urllib2,json,sys
 from functools import wraps
 from wechat_sdk import WechatBasic#,WechatConf
-from flask import request,redirect
+from flask import request,redirect,url_for
 from . import api
+from ..models import WechatUser,WechatMsg
+from .. import db
+from datetime import datetime
+import threading
 
 wechat = WechatBasic(token='xiaojian',
         appid='wxa7efb4ea17e8d080',
         appsecret='943d32ed8153dedb33d10b91c77cb8e0')
+
+def async(func):
+    @wraps(func)
+    def wrapper(*args,**kwargs):
+        my_thread = threading.Thread(target=func,args=args,kwargs=kwargs)
+        my_thread.start()
+    return wrapper
+
+@async
+def do_notify(msg):
+    url = 'http://www.xiaojian.site/api/v1.0/notify?msg=' + urllib2.quote(msg)
+    try:
+        urllib2.urlopen(url)
+    except urllib2.HTTPError,e:
+        print e.code
+    except urllib2.URLError,e:
+        print str(e)
 
 def check_signature(func):
     """
@@ -46,14 +67,42 @@ def handle_wechat_request():
         wechat.parse_data(request.data)
         message = wechat.get_message()
         openid = message.source #用户id
+        wechat_user = WechatUser.query.filter_by(wechat_id=openid).first()
+        if wechat_user is None:
+            wechat_user = WechatUser()
+            wechat_user.wechat_id = openid
+        wechat_user.last_visit = datetime.utcnow()
+        db.session.add(wechat_user)
+
         try:
             resp_func = routing_map[message.type]
-            response = resp_func()
+            response,resp = resp_func()
+            
+            request_text = None
+            if message.type == 'text':
+                request_text = message.content.encode('utf-8')
+            elif message.type == 'voice':
+                request_text = message.recognition
+            else:
+                response = wechat.response_text(u'发的啥呀，我看不懂...')
+
+            if request_text is not None:
+                wechat_msg = WechatMsg()
+                wechat_msg.msg_id = message.id
+                wechat_msg.msg_text = request_text
+                wechat_msg.msg_resp = resp.encode('utf-8')
+                wechat_msg.user = wechat_user
+                db.session.add(wechat_msg)
+                
+                push_msg = '公众号[%s]: %s %s' % (wechat_user.id,request_text,resp.encode('utf-8'))
+                do_notify(push_msg)
+
         except KeyError:
             response = 'success'
         return response
     else:
         return request.args.get('echostr','')
+
 @dispatch('subscribe')
 def subscribe_resp():
     return wechat.response_text(u'欢迎主人，我会陪你聊天，帮你查日历、天气、快递、车票、新闻、菜谱等，快跟我聊天吧！')
@@ -79,10 +128,10 @@ def turing(msg,userid):
     if content:
         code = content['code']
         if code == 100000:#文字类
-            return wechat.response_text(content['text'])
+            return wechat.response_text(content['text']),content['text']
         elif code == 200000:#链接类
             articles = [{'title':content['text'],'description':u'链接','url':content['url']}]
-            return wechat.response_news(articles)
+            return wechat.response_news(articles),u'链接'
         elif code == 302000:#新闻类
             articles = []
             for item in content['list'][:9]:
@@ -92,7 +141,7 @@ def turing(msg,userid):
                 row['url'] = item['detailurl']
                 row['picurl'] = item['icon']
                 articles.append(row)
-            return wechat.response_news(articles)
+            return wechat.response_news(articles),u'新闻'
         elif code == 308000:#菜谱类
             articles = []
             for item in content['list'][:9]:
@@ -102,8 +151,8 @@ def turing(msg,userid):
                 row['url'] = item['detailurl']
                 row['picurl'] = item['icon']
                 articles.append(row)
-            return wechat.response_news(articles)
+            return wechat.response_news(articles),u'菜谱'
         else:#其他
-            return wechat.response_text(content['text'])
+            return wechat.response_text(content['text']),content['text']
     else:
-        return wechat.response_text(u'说嘞啥？我都懵逼了！')
+        return wechat.response_text(u'说嘞啥？我都懵逼了！'),u'说嘞啥？我都懵逼了！'

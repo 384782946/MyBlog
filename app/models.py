@@ -418,6 +418,7 @@ class WechatUser(db.Model):
     __tablename__ = 'wechat_users'
     id = db.Column(db.Integer, primary_key=True)
     wechat_id = db.Column(db.String(64))
+    nickname = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     last_visit = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     msgs = db.relationship('WechatMsg', backref='user', lazy='dynamic')
@@ -426,6 +427,8 @@ class WechatMsg(db.Model):
     __tablename__ = 'wechat_msgs'
     id = db.Column(db.Integer, primary_key=True)
     msg_id = db.Column(db.Integer)
+    msg_text = db.Column(db.String(255))
+    msg_resp = db.Column(db.String(255))
     wechat_id = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     wechat_id = db.Column(db.Integer, db.ForeignKey('wechat_users.id'))
