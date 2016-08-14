@@ -64,17 +64,17 @@ def handle_wechat_request():
     处理微信请求
     """
     if request.method == 'POST':
-        wechat.parse_data(request.data)
-        message = wechat.get_message()
-        openid = message.source #用户id
-        wechat_user = WechatUser.query.filter_by(wechat_id=openid).first()
-        if wechat_user is None:
-            wechat_user = WechatUser()
-            wechat_user.wechat_id = openid
-        wechat_user.last_visit = datetime.utcnow()
-        db.session.add(wechat_user)
-
         try:
+            wechat.parse_data(request.data)
+            message = wechat.get_message()
+            openid = message.source #用户id
+            wechat_user = WechatUser.query.filter_by(wechat_id=openid).first()
+            if wechat_user is None:
+                wechat_user = WechatUser()
+                wechat_user.wechat_id = openid
+            wechat_user.last_visit = datetime.utcnow()
+            db.session.add(wechat_user)
+            
             resp_func = routing_map[message.type]
             response,resp = resp_func()
             
@@ -86,19 +86,17 @@ def handle_wechat_request():
             else:
                 response = wechat.response_text(u'发的啥呀，我看不懂...')
 
-            if request_text is not None:
-                wechat_msg = WechatMsg()
-                wechat_msg.msg_id = message.id
-                wechat_msg.msg_text = request_text
-                wechat_msg.msg_resp = resp.encode('utf-8')
-                wechat_msg.user = wechat_user
-                db.session.add(wechat_msg)
+            wechat_msg = WechatMsg()
+            wechat_msg.msg_id = message.id
+            wechat_msg.msg_text = request_text
+            wechat_msg.msg_resp = resp.encode('utf-8')
+            wechat_msg.user = wechat_user
+            db.session.add(wechat_msg)
                 
-                push_msg = '公众号[%s]: %s %s' % (wechat_user.id,request_text,resp.encode('utf-8'))
-                do_notify(push_msg)
-
-        except KeyError:
-            response = 'success'
+            #push_msg = '公众号[%d]发来消息' % wechat_user.id
+            #do_notify(push_msg)
+        except:
+            response = wechat.response_text(u'出错啦...')
         return response
     else:
         return request.args.get('echostr','')

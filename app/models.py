@@ -297,6 +297,8 @@ class User(UserMixin, db.Model):
 
 
 class AnonymousUser(AnonymousUserMixin):
+    id = 0
+
     def can(self, permissions):
         return False
 
@@ -429,7 +431,16 @@ class WechatMsg(db.Model):
     msg_id = db.Column(db.Integer)
     msg_text = db.Column(db.String(255))
     msg_resp = db.Column(db.String(255))
-    wechat_id = db.Column(db.String(64))
+    #wechat_id = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     wechat_id = db.Column(db.Integer, db.ForeignKey('wechat_users.id'))
 
+class Record(db.Model):
+    __tablename__ = 'record'
+    id = db.Column(db.Integer,primary_key = True)
+    blueprint = db.Column(db.String(64))
+    path = db.Column(db.String(255))
+    ip = db.Column(db.String(32))
+    timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
+    code = db.Column(db.Integer)
+    user = db.Column(db.Integer,db.ForeignKey('users.id'))

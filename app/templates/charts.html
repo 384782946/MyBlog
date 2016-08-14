@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}MyBlog - 统计数据{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>统计数据</h1>
+</div>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="{{ url_for('static', filename='js/chartkick.js') }}"></script>
+{% pie_chart post %}
+<h3 class='text-center'>文章数量分布</h3>
+<br/>
+{% line_chart pv %}
+<h3 class='text-center'>PV统计(本月)</h3>
+<br/>
+{% line_chart uv %}
+<h3 class='text-center'>UV统计(本月)</h3>
+<br/><br/>
+{% endblock %}
+

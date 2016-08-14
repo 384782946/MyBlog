@@ -1,3 +1,5 @@
+import chartkick
+
 from flask import Flask
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.mail import Mail
@@ -20,6 +22,7 @@ login_manager.login_view = 'auth.login'
 
 def create_app(config_name):
     app = Flask(__name__)
+    app.jinja_env.add_extension("chartkick.ext.charts")
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 

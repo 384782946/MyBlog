@@ -1,4 +1,6 @@
 #coding=utf-8
+
+import datetime,json
 from flask import render_template, redirect, url_for, abort, flash, request,\
     current_app, make_response
 from flask.ext.login import login_required, current_user
@@ -7,7 +9,7 @@ from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm,\
     CommentForm
 from .. import db
-from ..models import Permission, Role, User, Post, Comment
+from ..models import Permission, Role, User, Post, Comment, Record
 from ..decorators import admin_required, permission_required
 
 
@@ -19,6 +21,15 @@ def after_request(response):
                 'Slow query: %s\nParameters: %s\nDuration: %fs\nContext: %s\n'
                 % (query.statement, query.parameters, query.duration,
                    query.context))
+    #统计
+    record = Record()
+    record.blueprint = 'main'
+    record.path = request.path
+    record.ip = request.remote_addr
+    record.code = response.status_code
+    if current_user.id > 0:
+        record.user = current_user.id
+    db.session.add(record)
     return response
 
 
@@ -53,6 +64,7 @@ def index():
 
 
 @main.route('/user/<username>')
+@login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     #page = request.args.get('page', 1, type=int)
@@ -324,3 +336,30 @@ def moderate_disable(id):
     db.session.add(comment)
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
+
+@main.route('/charts')
+def charts():
+    popular = User.query.outerjoin(Post).group_by(User.id).order_by(db.func.count(Post.id).desc()).limit(10).all()
+    post = {}
+    for user in popular:
+        post_num = user.posts.count()
+        if post_num > 0:
+            post[user.username.encode('utf-8')] = int(user.posts.count())
+    today = datetime.date.today()
+    lastmonth = today - datetime.timedelta(days=30)
+    today_str = '%d-%d-%d' % (today.year,today.month,today.day+2)
+    lastmonth_str = '%d-%d-%d' % (lastmonth.year,lastmonth.month,lastmonth.day)
+    records = db.session.query(Record.timestamp,db.func.count(Record.timestamp)).filter(Record.timestamp.between(lastmonth_str,today_str)).order_by(Record.timestamp).group_by(db.func.day(Record.timestamp),Record.user).all()
+    pv = {}
+    uv = {}
+    for rec in records:
+        tm = rec[0]
+        tm_str = '%d-%d-%d' % (tm.year,tm.month,tm.day)
+        num = int(rec[1])
+        if pv.has_key(tm_str):
+            pv[tm_str] += num
+            uv[tm_str] += 1
+        else:
+            pv[tm_str] = num
+            uv[tm_str] = 1
+    return render_template('charts.html',post=post,pv=pv,uv=uv)
