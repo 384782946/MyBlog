@@ -2,9 +2,13 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "_macros.html" as macros %}
 
-{% block title %}MyBlog - Post{% endblock %}
+{% block title %}MyBlog - 文章{% endblock %}
 
 {% block page_content %}
+<!--<div class="page-header">-->
+<div>
+    <h1>文章</h1>
+</div>
 {% include '_posts.html' %}
 <h4 id="comments">评论</h4>
 {% if current_user.can(Permission.COMMENT) %}

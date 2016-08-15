@@ -6,6 +6,8 @@ __pycache__/
 config.py
 .idea/
 app/static/img
+backup_mysql.py
+backup/
 
 # C extensions
 *.so

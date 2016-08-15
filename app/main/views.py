@@ -336,6 +336,9 @@ def moderate_disable(id):
     db.session.add(comment)
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
+@main.route('/projects')
+def projects():
+    return render_template('projects.html')
 
 @main.route('/charts')
 def charts():
