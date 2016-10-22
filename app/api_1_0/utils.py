@@ -3,7 +3,7 @@ from jpush import common
 from . import api
 from flask import request
 
-_jpush = jpush.JPush(u'f5bed5a1c355efee733ac6d1', u'5c81a08c6d08339c77a4ed77')
+_jpush = jpush.JPush(u'', u'')
 
 @api.route('/notify')
 def nofity():
