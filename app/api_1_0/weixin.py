@@ -10,9 +10,9 @@ from .. import db
 from datetime import datetime
 import threading
 
-wechat = WechatBasic(token='xiaojian',
-        appid='wxa7efb4ea17e8d080',
-        appsecret='943d32ed8153dedb33d10b91c77cb8e0')
+wechat = WechatBasic(token='',
+        appid='',
+        appsecret='')
 
 def async(func):
     @wraps(func)
